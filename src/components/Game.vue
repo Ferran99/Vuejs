@@ -17,7 +17,7 @@
 
         </template>
 
-        <div id="puzzle-container"></div>
+        <div v-show="puzzle" id="puzzle-container"></div>
         <transition name="fade">
 
         <div id="puzzle-words"></div>
@@ -42,11 +42,13 @@
 
         Game = false;
         solution = false;
+        puzzle = false;
 
 
         start() {
             this.StartGame = false;
             this.Game = true;
+            this.puzzle = true;
            // document.getElementById('solveBTN').classList.add('d-none');
             /*var radoomWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'n', 'm', 'o', 'p', 'q', 'w', 't'];
             var id = [];
