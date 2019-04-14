@@ -1,6 +1,15 @@
 <template>
     <div>
+
+
         <template>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#"> {{user}}</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+            </nav>
             <button id="startButton" v-show="StartGame" type="button" v-on:click="start" class=" btn btn-primary">Start
                 Game
             </button>
@@ -13,27 +22,32 @@
 
         <div id="puzzle-words"></div>
         </transition>
+        <transition name="bounce">
 
-        <input type="button" id="solveBTN" value="Solve puzzle"/>
+        <input v-show="solution" type="button" id="solveBTN" value="Solve puzzle"/>
+        </transition>
     </div>
 
 </template>
 
 <script>
     import { Component, Prop, Vue } from 'vue-property-decorator';
+    //import words from '/src/assets/Paraules/Words.json'
     @Component
 
     export  default class GameStart extends Vue {
 
-
+        user = localStorage.getItem('Username');
         StartGame = true;
 
         Game = false;
+        solution = false;
 
 
         start() {
             this.StartGame = false;
             this.Game = true;
+           // document.getElementById('solveBTN').classList.add('d-none');
             /*var radoomWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'n', 'm', 'o', 'p', 'q', 'w', 't'];
             var id = [];
             let tr = 0;
@@ -143,27 +157,44 @@
             }
 
         */
-            var words = ['cows', 'tracks', 'arrived', 'located', 'sir', 'seat',
-                'division', 'effect', 'underline', 'view', 'annual',
-                'anniversary', 'centennial', 'millennium', 'perennial',
-                'artisan', 'apprentice', 'meteorologist', 'blizzard', 'tornado',
-                'intensify','speed','count','consonant','someone',
-                'sail','rolled','bear','wonder','smiled','angle', 'absent',
-                'decadent', 'excellent', 'frequent', 'impatient', 'cell',
-                'cytoplasm', 'organelle', 'diffusion', 'osmosis',
-                'respiration'
-            ];
 
-            // Start a basic word game without customization !
-            var gamePuzzle = wordfindgame.create(words, '#puzzle-container', '#puzzle-words');
+            var requestURL ="http://localhost:3000";
+            var request = new XMLHttpRequest();
+            request.open('GET', requestURL);
+            request.responseType = 'json';
+            request.send();
+            request.onload = function() {
 
-            $("#solveBTN").click(function(){
-                // Solve the puzzle !
-                var result = wordfindgame.solve(gamePuzzle, words);
-                console.log(result);
-            });
+                var words = request.response;
+                localStorage.setItem("Words", JSON.stringify(words));
+                console.log(words);
+                // Start a basic word game without customization !
+                var gamePuzzle = wordfindgame.create(words, '#puzzle-container', '#puzzle-words');
+
+                $("#solveBTN").click(function(){
+                    // Solve the puzzle !
+                    var result = wordfindgame.solve(gamePuzzle, words);
+                    console.log(result);
+                });
+
+
+
+            };
+
+            this.calculateTime();
+        }
+        calculateTime(){
+            setInterval(this.showResolve.bind(this), 10000);
+            clearInterval();
+
+
 
         }
+        showResolve(){
+            this.solution = true;
+            //document.getElementById('solveBTN').classList.remove('d-none');
+        }
+
     }
 
 </script>
@@ -255,5 +286,22 @@
 
     #solve {
         margin: 0 30px;
+    }
+    .bounce-enter-active {
+        animation: bounce-in .5s;
+    }
+    .bounce-leave-active {
+        animation: bounce-in .5s reverse;
+    }
+    @keyframes bounce-in {
+        0% {
+            transform: scale(0);
+        }
+        50% {
+            transform: scale(1.5);
+        }
+        100% {
+            transform: scale(1);
+        }
     }
 </style>
